@@ -132,6 +132,16 @@
         ]
     },
     {
+        "title": "Back to the future",
+        "director": "Robert Zemeckis",
+        "year": 1985,
+        "genres": [
+            "Commedy",
+            "Sci-Fi",
+            "Action"
+        ]
+    },
+    {
         "title": "Forest Gump",
         "director": "Robert Zemeckis",
         "year": 1985,
