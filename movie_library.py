@@ -25,14 +25,19 @@ from collections import Counter
 
 class MovieLibrary:
 
-    def __init__(self, json_file: str) -> None:
-        # Inizializza la classe con il percorso del file JSON.
-        # Verifica se il file esiste. Se non esiste, solleva un'eccezione.
-        self.json_file = json_file
+    class MovieNotFoundError(Exception):
+        pass
 
+        # Inizializza la classe con il percorso del file JSON.
+    def __init__(self, json_file=r"C:\Users\bipbo\Documents\GitHub\Programing_principles-esame\movies (1).json"):
+        self.json_file = json_file
+        self.movies = []
+       
+
+    #ES17
         if not os.path.exists(self.json_file):
             raise FileNotFoundError(f"The file {self.json_file} does not exist.")
-        
+
         # Carica i film dal file JSON nella variabile di istanza `movies`.
         with open(self.json_file, 'r', encoding='utf-8') as f:
             self.movies = json.load(f)
@@ -43,27 +48,21 @@ class MovieLibrary:
         with open(self.json_file, 'w', encoding='utf-8') as f:
             json.dump(self.movies, f, indent=4)
 
-def get_movie_or_raise(self, title: str):
-    """Restituisce il film con il titolo specificato o solleva un'eccezione se non esiste."""
-    try:
-        return next(movie for movie in self.movies if movie.get('title') == title)
-    except StopIteration:
-        raise Exception("Movie was not found")
+    #ES18
+    def get_movie_or_raise(self, title: str):
+        try:
+            return next(movie for movie in self.movies if movie.get('title') == title)
+        except StopIteration:
+            raise self.MovieNotFoundError("Movie was not found")
 
-def remove_movie(self, title: str):
-    """Rimuove un film dalla collezione con il titolo specificato e aggiorna il file JSON."""
-    movie_to_remove = self.get_movie_or_raise(title)
-    self.movies.remove(movie_to_remove)
-    self.update_json_file()
-
-def update_movie(self, title: str, updated_data: dict):
-    """Aggiorna un film esistente con i dati forniti e aggiorna il file JSON."""
-    movie_to_update = self.get_movie_or_raise(title)
-    movie_to_update.update(updated_data)
-    self.update_json_file()
+    def update_movie(self, title: str, updated_data: dict):
+        # Aggiorna un film esistente con i dati forniti e aggiorna il file JSON.
+        movie_to_update = self.get_movie_or_raise(title)
+        movie_to_update.update(updated_data)
+        self.__update_json_file()
 
     # ES1
-    # Crea un metodo chiamato get_movies che restituisce l’intera collezione di film.
+    # Crea un metodo chiamato get_movies che restituisce l'intera collezione di film.
 
     def get_movies(self):
         # Restituisce l'intera collezione di film come lista di dizionari.
@@ -84,7 +83,7 @@ def update_movie(self, title: str, updated_data: dict):
             "genres": genres
         }
         self.movies.append(new_movie)
-        self.__update_json_file() # Aggiorna il file JSON per salvare la modifica.
+        self.__update_json_file()  # Aggiorna il file JSON per salvare la modifica.
 
     # ES3
     # Crea un metodo chiamato remove_movie che ha il parametro title.
@@ -97,7 +96,7 @@ def update_movie(self, title: str, updated_data: dict):
                 self.movies.remove(movie)
                 self.__update_json_file()
                 return movie
-        raise Exception(f"Movie '{title}' not found.")
+        raise self.MovieNotFoundError(f"Movie '{title}' not found.")
 
     # ES4
     # Crea un metodo chiamato update_movie che ha il parametro title e i parametri opzionali director, year e genres.
@@ -116,7 +115,7 @@ def update_movie(self, title: str, updated_data: dict):
                     movie["genres"] = genres
                 self.__update_json_file()
                 return movie
-        raise Exception(f"Movie '{title}' not found.")
+        raise self.MovieNotFoundError(f"Movie '{title}' not found.")
 
     # ES5
     # Crea un metodo chiamato get_movie_titles che restituisce una lista contenente
@@ -130,7 +129,7 @@ def update_movie(self, title: str, updated_data: dict):
     # Crea un metodo chiamato count_movies che restituisce il numero totale dei film nella collezione.
 
     def count_movies(self):
-         # Restituisce il numero totale di film nella collezione.
+        # Restituisce il numero totale di film nella collezione.
         return len(self.movies)
 
     # ES7
@@ -142,8 +141,8 @@ def update_movie(self, title: str, updated_data: dict):
         for movie in self.movies:
             if movie["title"].lower() == title.lower():
                 return movie
-             # Solleva un'eccezione se il film non viene trovato.
-        raise Exception(f"Movie '{title}' not found.")
+        # Solleva un'eccezione se il film non viene trovato.
+        raise self.MovieNotFoundError(f"Movie '{title}' not found.")
 
     # ES8
     # Crea un metodo chiamato get_movies_by_title_substring che ha il parametro substring.
@@ -159,7 +158,7 @@ def update_movie(self, title: str, updated_data: dict):
 
         if not matching_movies:
             # Solleva un'eccezione se nessun film corrisponde
-            raise Exception(f"No movies found containing '{substring}'.")
+            raise self.MovieNotFoundError(f"No movies found containing '{substring}'.")
         return matching_movies
 
     # ES9
@@ -174,8 +173,8 @@ def update_movie(self, title: str, updated_data: dict):
                 result.append(movie)
 
         if not result:
-             # Solleva un'eccezione se non ci sono film corrispondenti.
-            raise Exception(f"No movies found for year {year}.")
+            # Solleva un'eccezione se non ci sono film corrispondenti.
+            raise self.MovieNotFoundError(f"No movies found for year {year}.")
         return result
 
     # ES10
@@ -191,8 +190,8 @@ def update_movie(self, title: str, updated_data: dict):
                 count += 1
 
         if count == 0:
-             # Solleva un'eccezione se non ci sono film per il regista specificato.
-            raise Exception(f"No movies found for director '{director}'.")
+            # Solleva un'eccezione se non ci sono film per il regista specificato.
+            raise self.MovieNotFoundError(f"No movies found for director '{director}'.")
         return count
 
     # ES11
@@ -208,7 +207,7 @@ def update_movie(self, title: str, updated_data: dict):
                 matching_movies.append(movie)
 
         if not matching_movies:
-            raise Exception(f"No movies found for genre '{genre}'.")
+            raise self.MovieNotFoundError(f"No movies found for genre '{genre}'.")
         return matching_movies
 
     # ES12
@@ -260,7 +259,7 @@ def update_movie(self, title: str, updated_data: dict):
     # dall’anno start_year fino all’anno end_year (estremi compresi).
 
     def get_titles_between_years(self, start_year: int, end_year: int) -> list[str]:
-         # Restituisce i titoli dei film pubblicati tra due anni specificati (inclusi).
+        # Restituisce i titoli dei film pubblicati tra due anni specificati (inclusi).
         titles_in_range = []
         for movie in self.movies:
             if start_year <= movie["year"] <= end_year:
@@ -272,27 +271,26 @@ def update_movie(self, title: str, updated_data: dict):
     # fra i film della collezione. Non considerare il caso in cui vi siano pari merito.
 
     def get_most_common_year(self) -> int:
-         # Trova l'anno più frequente tra i film.
+        # Trova l'anno più frequente tra i film.
         if not self.movies:
             raise self.MovieNotFoundError("Collection is empty.")
         years = [movie["year"] for movie in self.movies]
         year_counts = Counter(years)
         most_common = year_counts.most_common(1)
         return most_common[0][0]
-
-"""
+    
 # MAIN
 
 if __name__ == "__main__":
     # Questo blocco viene eseguito solo se il file viene eseguito direttamente e non importato come modulo.
-    
+
     # Specifica il percorso del file JSON contenente la collezione di film.
-    json_path = r"C:\\Users\\bipbo\\Desktop\\Programming Principles - Traccia (1)\\movies (1).json"
+    json_path = r"C:\Users\bipbo\Documents\GitHub\Programing_principles-esame\movies (1).json"
 
     try:
         # Crea un'istanza della classe MovieLibrary utilizzando il percorso del file JSON.
         # Se il file non esiste, viene sollevata un'eccezione FileNotFoundError.
-        library = MovieLibrary(json_path)
+        library = MovieLibrary(r"C:\Users\bipbo\Documents\GitHub\Programing_principles-esame\movies (1).json")
     except FileNotFoundError as e:
         # Gestisce l'errore se il file JSON non viene trovato, mostrando un messaggio esplicativo.
         print(e)
@@ -312,7 +310,7 @@ if __name__ == "__main__":
             removed = library.remove_movie("Forest Gump")
             print("Film removed:", removed)
         except MovieLibrary.MovieNotFoundError as e:
-             # Gestisce il caso in cui il film non esiste nella collezione
+            # Gestisce il caso in cui il film non esiste nella collezione.
             print("Error removing:", e)
 
         # Aggiunge di nuovo "Forest Gump" per consentire ulteriori test su altri metodi.
@@ -329,7 +327,7 @@ if __name__ == "__main__":
 
         # ES5: get_movie_titles
         # Stampa tutti i titoli dei film presenti nella collezione.
-        print("all Title of movies:", library.get_movies_title())
+        print("All titles of movies:", library.get_movies_title())
 
         # ES6: count_movies
         # Stampa il numero totale di film nella collezione.
@@ -377,7 +375,7 @@ if __name__ == "__main__":
             action_movies = library.get_movies_by_genre("Action")
             print("Movies of genre 'Action':", action_movies)
         except MovieLibrary.MovieNotFoundError as e:
-              # Gestisce il caso in cui non ci sono film per il genere specificato.
+            # Gestisce il caso in cui non ci sono film per il genere specificato.
             print("Error:", e)
 
         # ES12: get_oldest_movie_title
@@ -396,16 +394,16 @@ if __name__ == "__main__":
         print("Longest movie title:", longest_title)
 
         # ES15: get_titles_between_years
-        # Cerca e stampa i titoli dei film pubblicati tra il 1990 e il 2000 (inclusi)
+        # Cerca e stampa i titoli dei film pubblicati tra il 1990 e il 2000 (inclusi).
         between_titles = library.get_titles_between_years(1990, 2000)
         print("Movies between 1990 and 2000:", between_titles)
 
         # ES16: get_most_common_year
         try:
-             # Trova e stampa l'anno più frequente tra i film nella collezione.
+            # Trova e stampa l'anno più frequente tra i film nella collezione.
             common_year = library.get_most_common_year()
             print("Most common year:", common_year)
         except MovieLibrary.MovieNotFoundError as e:
             # Gestisce il caso in cui la collezione è vuota.
             print("Error:", e)
-"""
+            
